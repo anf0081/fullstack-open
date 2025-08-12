@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant browser as browser
+  participant server as server
+
+  Note right of browser: The browser starts executing JS code on form submit event
+  browser ->> browser: The browser prevents the default handling with e.preventDefault(),<br>creates a new note, adds it to the notes list, <br> rerenders the note list and sends the sends new note to the server.
+  Note right of browser: The browser already rendered the new note before sending it to the server
+  browser ->>+ server: POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa with Payload <br>{content: "note_content", date: "YYYY-MM-DDTHH:mm:ss.SSSZ"} <br>and Content-Type application/json
+  Note left of server: The server create the new note object, <br>and adds it to the notes array
+  server -->>- browser: Status Code: 201 created <br>Response: {"message":"note created"}
+
+
+
