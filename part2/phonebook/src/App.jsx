@@ -68,12 +68,12 @@ const App = () => {
   const updateNumber = (object) => {
     if (window.confirm(`${object.name} is already added to phonebook. Do you want to replace the old number with the new one?`)) {
       personService.update(object.id, object)
-      .catch(err => {
+      .catch(() => {
         setErrorMessage(`'${object.name}' was already removed from server`)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
-        setNotes(notes.filter(n => n.id !== id))
+        setPersons(persons.filter(n => n.id !== object.id))
       })
       .then(returnedPerson => {
         const updatedPersons = persons.map(person => person.id === object.id ? returnedPerson : person)
@@ -100,7 +100,7 @@ const App = () => {
     if (window.confirm(`Do you want to delete ${toDeletePerson.name}?`)) {
       const updatedPersons = persons.filter(person => person.id !== id)
       personService.deleteId(id)
-      .then(response => {
+      .then(() => {
         setPersons(updatedPersons)
         setfilteredList(updatedPersons)
         resetInput()
@@ -109,20 +109,14 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
       })
-      .catch(err => {
-        setErrorMessage(`'${object.name}' was already removed from server`)
+      .catch(() => {
+        setErrorMessage(`'${toDeletePerson.name}' was already removed from server`)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
       })
     }
   }
-
-  const deletePerson = (id) => {
-    const person = persons.find(n => n.id === id)
-    
-  }
-
   
 
   return (
