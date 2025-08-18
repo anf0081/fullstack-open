@@ -12,7 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setfilterName] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
-
+  
   useEffect(() => {
     personService
       .getAll()
@@ -43,56 +43,65 @@ const App = () => {
   }
 
   const handleAddPerson = (event) => {
-    event.preventDefault()
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-    }
-    if (persons.some(person => person.name === newName)) { 
-      const existingPerson = persons.find(person => person.name === newName)
-      const updatedObject = {...nameObject, id: existingPerson.id}
-      updateNumber(updatedObject) 
-      setErrorMessage({message: `Successfully updated the number of ${updatedObject.name} to ${updatedObject.number}`, positive: true})
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-    else {
-      addPerson(nameObject)
-      setErrorMessage({message: `Successfully added ${nameObject.name}`, positive: true})
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-    }
-  }
+  event.preventDefault()
 
-  const updateNumber = (object) => {
-    if (window.confirm(`${object.name} is already added to phonebook. Do you want to replace the old number with the new one?`)) {
-      personService.update(object)
-      .catch(() => {
-        setErrorMessage(`'${object.name}' was already removed from server`)
+  let nameObject = {
+    name: newName,
+    number: newNumber,
+  }
+  if (persons.some(person => person.name === newName)) { 
+    const existingPerson = persons.find(person => person.name === newName)
+    const updatedObject = {...nameObject, id: existingPerson.id}
+    updateNumber(updatedObject)
+  } else {
+    addPerson(nameObject)
+    setErrorMessage({message: `Successfully added ${nameObject.name}`, positive: true})
+    setTimeout(() => setErrorMessage(null), 5000)
+  }
+}
+
+  const updateNumber = (updatedPerson) => {
+  if (window.confirm(`${updatedPerson.name} is already added to phonebook. Do you want to replace the old number with the new one?`)) {
+    personService.update(updatedPerson)
+      .then(response => {
+        if (!response) {
+          setErrorMessage({message: `Failed to update '${updatedPerson.name}'. Please add a number with minimum 8 characters.`})
+        } else {
+          const updatedPersons = persons.map(person => person.id === updatedPerson.id ? response : person)
+          setPersons(updatedPersons)
+          setfilteredList(updatedPersons)
+          setErrorMessage({message: `Successfully updated the number of ${updatedPerson.name} to ${updatedPerson.number}`, positive: true})
+          resetInput()
+        }
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
-        setPersons(persons.filter(n => n.id !== object.id))
       })
-      .then(returnedPerson => {
-        const updatedPersons = persons.map(person => person.id === object.id ? returnedPerson : person)
-        setPersons(updatedPersons)
-        setfilteredList(updatedPersons)
-        resetInput()
+      .catch(() => {
+        setErrorMessage({message: `Failed to update '${updatedPerson.name}'. Please add a number with minimum 8 characters.`})
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
-    }
-  }  
+  }
+}
 
-  const addPerson = (object) => {
-    personService.create(object)
+
+  const addPerson = (newPerson) => {
+    personService.create(newPerson)
       .then(response => {
+        if (response) {
         const updatedPersons = persons.concat(response)
         setPersons(updatedPersons)
         setfilteredList(updatedPersons)
         resetInput()
+        } 
+      }).catch(() => {
+        setErrorMessage({message: 'Failed to add person. Please add a name with minimum 3 and a number with minimum 8 characters.'})
       })
+      setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
   }
 
   const handleDeletePerson = (id) => {
@@ -106,16 +115,15 @@ const App = () => {
         setfilteredList(updatedPersons)
         resetInput()
         setErrorMessage({message: `Successfully deleted ${toDeletePerson.name}`, positive: false})
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
       })
       .catch(() => {
+        resetInput()
         setErrorMessage(`'${toDeletePerson.name}' was already removed from server`)
-        setTimeout(() => {
+  
+      })
+      setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
-      })
     }
   }
   
