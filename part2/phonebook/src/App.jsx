@@ -47,11 +47,12 @@ const App = () => {
     const nameObject = {
       name: newName,
       number: newNumber,
-      id: newName,
     }
     if (persons.some(person => person.name === newName)) { 
-      updateNumber(nameObject)
-      setErrorMessage({message: `Successfully updated the number of ${nameObject.name} to ${nameObject.number}`, positive: true})
+      const existingPerson = persons.find(person => person.name === newName)
+      const updatedObject = {...nameObject, id: existingPerson.id}
+      updateNumber(updatedObject) 
+      setErrorMessage({message: `Successfully updated the number of ${updatedObject.name} to ${updatedObject.number}`, positive: true})
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -67,7 +68,7 @@ const App = () => {
 
   const updateNumber = (object) => {
     if (window.confirm(`${object.name} is already added to phonebook. Do you want to replace the old number with the new one?`)) {
-      personService.update(object.id, object)
+      personService.update(object)
       .catch(() => {
         setErrorMessage(`'${object.name}' was already removed from server`)
         setTimeout(() => {
