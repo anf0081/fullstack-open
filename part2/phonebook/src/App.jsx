@@ -55,8 +55,6 @@ const App = () => {
     updateNumber(updatedObject)
   } else {
     addPerson(nameObject)
-    setErrorMessage({message: `Successfully added ${nameObject.name}`, positive: true})
-    setTimeout(() => setErrorMessage(null), 5000)
   }
 }
 
@@ -94,6 +92,7 @@ const App = () => {
         const updatedPersons = persons.concat(response)
         setPersons(updatedPersons)
         setfilteredList(updatedPersons)
+        setErrorMessage({message: `Successfully added ${updatedPersons.name}`, positive: true})
         resetInput()
         } 
       }).catch(() => {
