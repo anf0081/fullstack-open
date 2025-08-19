@@ -25,19 +25,19 @@ app.get('/info', (request, response) => {
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
-      response.json(persons)
-    })
+    response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   Person.findById(id)
     .then(person => {
-    if (person) {
-      response.json(person)
-    } else {
-      response.status(404).end()
-    }
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).end()
+      }
     })
     .catch(error => next(error))
 })
@@ -45,23 +45,21 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   Person.findByIdAndDelete(id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response, next) => {
-    const body = request.body
-
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
-    person.save().then(savedPerson => {
-      response.json(savedPerson)
-    })
-    .catch(error => next(error))
+  const body = request.body
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  }).catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {

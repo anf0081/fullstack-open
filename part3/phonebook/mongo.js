@@ -26,20 +26,19 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema, 'persons')
 
 if ( name && number ) {
-const person = new Person({
-  name: typeof name === "string" ? name : name.toString,
-  number: typeof number === "string" ? number : number.toString,
-})
-person.save().then(() => {
-  console.log('person saved!')
-  mongoose.connection.close()
-})
+  const person = new Person({
+    name: typeof name === 'string' ? name : name.toString,
+    number: typeof number === 'string' ? number : number.toString,
+  })
+  person.save().then(() => {
+    console.log('person saved!')
+    mongoose.connection.close()
+  })
 } else {
   Person.find({}).then(result => {
-  result.forEach(person => {
-    console.log(person)
+    result.forEach(person => {
+      console.log(person)
+    })
+    mongoose.connection.close()
   })
-  mongoose.connection.close()
-})
 }
- 
