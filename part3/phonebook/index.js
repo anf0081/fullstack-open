@@ -95,9 +95,9 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
+    return response.status(400).send({ error: 'Malformatted id.' })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: 'not enough characters' })
+    return response.status(400).send({ error: ' Name must be at least 3 characters and number must have a length of min. 8 in a format like 01-1234556 or 012-123456.' })
   }
 
   next(error)
